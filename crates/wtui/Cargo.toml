@@ -1,0 +1,24 @@
+[package]
+name = "wtui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+crossterm = { workspace = true }
+csv = { workspace = true }
+humantime = { workspace = true }
+indicatif = { workspace = true }
+itertools = { workspace = true }
+ratatui = { workspace = true }
+serde = { workspace = true }
+time = { workspace = true }
+tracing = { workspace = true }
+wtui-core = { path = "../wtui-core" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+assert_cmd = "2.0"
+predicates = "3.1"
+

@@ -26,6 +26,11 @@ Example preset ideas:
 - NixOS: `nix run .#wtui` and `nix run .#wtui-daemon` (flake outputs).
 - Non-Nix: `cargo install --path crates/wtui-daemon` and `cargo install --path crates/wtui`.
 
+Workspace layout:
+- `crates/wtui-core`: shared config, SQLite schema/migrations, metric readers, time utilities.
+- `crates/wtui-daemon`: headless sampler that writes to SQLite, handles SIGHUP reloads, PID guard, retention pruning.
+- `crates/wtui`: TUI viewer with CSV export and preset picker.
+
 Local development shell:
 ```
 nix develop
@@ -43,6 +48,7 @@ nix develop
 - Live view last hour CPU/RAM: `wtui --range 1h --charts cpu,ram`
 - Use a preset: `wtui --preset battery_day`
 - CSV export: `wtui --report net_daily --csv > net.csv`
+- In the TUI, press `c` to write the current view to `./wtui-export.csv`; `h` switches to historical (SQLite) and `l` to live mode.
 
 ## Configuration
 
@@ -121,6 +127,8 @@ disk_year = { kind = "chart", metrics = ["disk_usage"], range = "365d" }
 - Lint/format: `cargo fmt && cargo clippy --all-targets --all-features`
 - Tests: `cargo test --workspace`
 - Mock data: include a small seed DB in `./fixtures` for TUI work without the daemon.
+
+Nix development shell: `nix develop` (includes Rust toolchain, pkg-config, SQLite headers). The flake also exposes `packages.wtui` and `packages.wtui-daemon` for the two binaries.
 
 ## Technical implementation
 
