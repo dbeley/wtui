@@ -4,39 +4,28 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    crane.url = "github:ipetkov/crane";
   };
 
-  outputs = { self, nixpkgs, flake-utils, crane }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        craneLib = crane.lib.${system};
-        src = craneLib.cleanCargoSource (craneLib.path ./.);
-        commonArgs = {
-          inherit src;
-          pname = "wtui";
+        rustPkg = { pname, cargoFlags ? [] }: pkgs.rustPlatform.buildRustPackage {
+          inherit pname;
           version = "0.1.0";
-          doCheck = true;
+          src = ./.;
+          cargoLock = {
+            lockFile = ./Cargo.lock;
+          };
+          cargoBuildFlags = cargoFlags;
           buildInputs = [ pkgs.pkg-config pkgs.sqlite ];
         };
-        cargoArtifacts = craneLib.buildDepsOnly commonArgs;
       in {
-        packages.wtui = craneLib.buildPackage (commonArgs // {
-          inherit cargoArtifacts;
-          cargoExtraArgs = "-p wtui";
-        });
-
-        packages.wtui-daemon = craneLib.buildPackage (commonArgs // {
-          inherit cargoArtifacts;
-          pname = "wtui-daemon";
-          cargoExtraArgs = "-p wtui-daemon";
-        });
-
+        packages.wtui = rustPkg { pname = "wtui"; cargoFlags = [ "-p" "wtui" ]; };
+        packages.wtui-daemon = rustPkg { pname = "wtui-daemon"; cargoFlags = [ "-p" "wtui-daemon" ]; };
         packages.default = self.packages.${system}.wtui;
 
         devShells.default = pkgs.mkShell {
-          inputsFrom = [ cargoArtifacts ];
           buildInputs = [
             pkgs.rustup
             pkgs.pkg-config

@@ -128,7 +128,7 @@ disk_year = { kind = "chart", metrics = ["disk_usage"], range = "365d" }
 - Tests: `cargo test --workspace`
 - Mock data: include a small seed DB in `./fixtures` for TUI work without the daemon.
 
-Nix development shell: `nix develop` (includes Rust toolchain, pkg-config, SQLite headers). The flake also exposes `packages.wtui` and `packages.wtui-daemon` for the two binaries.
+Nix development shell: `nix develop` (includes Rust toolchain, pkg-config, SQLite headers). The flake exposes `packages.wtui` and `packages.wtui-daemon` for the two binaries built via `rustPlatform.buildRustPackage`.
 
 ## Technical implementation
 
